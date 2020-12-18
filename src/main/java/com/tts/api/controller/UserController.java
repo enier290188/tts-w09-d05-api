@@ -3,8 +3,12 @@ package com.tts.api.controller;
 import com.tts.api.entity.UserEntity;
 import com.tts.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +34,12 @@ public class UserController {
      */
 
     @PostMapping("")
-    public void createUser(@RequestBody UserEntity userEntity) {
+    public ResponseEntity<Void> createUser(@RequestBody @Valid UserEntity userEntity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         userRepository.save(userEntity);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
