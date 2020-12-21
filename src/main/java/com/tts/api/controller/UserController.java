@@ -74,4 +74,8 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @RequestMapping("/all")
+    public void all() {
+    }
 }
