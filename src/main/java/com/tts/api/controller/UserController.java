@@ -20,18 +20,13 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping("")
-    public List<UserEntity> getUsers() {
+    public List<UserEntity> getUsers(@RequestParam(value = "state", required = false) String state) {
+        if (state != null) {
+            return (List<UserEntity>) userRepository.findByState(state);
+        }
         return (List<UserEntity>) userRepository.findAll();
     }
 
-    /*
-     * @GetMapping("") public List<UserEntity> getUsers(@RequestParam(value = "state", required = false) String state) {
-     * if (state != null) {
-     * return (List<UserEntity>) userRepository.findByState(state);
-     * }
-     * return (List<UserEntity>) userRepository.findAll();
-     * }
-     */
 
     @PostMapping("")
     public ResponseEntity<Void> createUser(@RequestBody @Valid UserEntity userEntity, BindingResult bindingResult) {
@@ -48,8 +43,21 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void updateUserById(@PathVariable(value = "id") Long id, @RequestBody UserEntity userEntity) {
-        userRepository.save(userEntity);
+    public ResponseEntity<Void> updateUserById(@PathVariable(value = "id") Long id, @RequestBody UserEntity userEntity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<UserEntity> userEntityData = userRepository.findById(id);
+        if (userEntityData.isPresent()) {
+            UserEntity _userEntity = userEntityData.get();
+            _userEntity.setFirstName(userEntity.getFirstName());
+            _userEntity.setLastName(userEntity.getLastName());
+            _userEntity.setState(userEntity.getState());
+            userRepository.save(_userEntity);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")
