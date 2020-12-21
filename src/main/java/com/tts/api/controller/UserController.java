@@ -20,13 +20,12 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping("")
-    public List<UserEntity> getUsers(@RequestParam(value = "state", required = false) String state) {
+    public ResponseEntity<List<UserEntity>> getUsers(@RequestParam(value = "state", required = false) String state) {
         if (state != null) {
-            return (List<UserEntity>) userRepository.findByState(state);
+            return new ResponseEntity<>((List<UserEntity>) userRepository.findByState(state), HttpStatus.OK);
         }
-        return (List<UserEntity>) userRepository.findAll();
+        return new ResponseEntity<>((List<UserEntity>) userRepository.findAll(), HttpStatus.OK);
     }
-
 
     @PostMapping("")
     public ResponseEntity<Void> createUser(@RequestBody @Valid UserEntity userEntity, BindingResult bindingResult) {
