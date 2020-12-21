@@ -37,8 +37,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Optional<UserEntity> getUserById(@PathVariable(value = "id") Long id) {
-        return userRepository.findById(id);
+    public ResponseEntity<UserEntity> getUserById(@PathVariable(value = "id") Long id) {
+        Optional<UserEntity> userEntityData = userRepository.findById(id);
+        if (userEntityData.isPresent()) {
+            return new ResponseEntity<>(userEntityData.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/{id}")
